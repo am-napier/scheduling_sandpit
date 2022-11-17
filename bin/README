@@ -1,19 +1,15 @@
 
-parser.add_argument('name')
+Run the following commands from the bin folder to generate a bin/savedsearches.conf
+If you are happy with that add it to local and restart
 
-'-c/--cron', default="*/5"
-'-s/--skew', default=None)
-'-p', '--pause', default=10)
-'-n', '--count', default=100)
-'-w', '--window', default="auto")
+The args of gen_searches.py are: 
 
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 2 win-auto-normal -o
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 2 win-auto-higher -x higher
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -w 0 -n 2 win-0-highest -x highest
 
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 50 win-auto-normal -o
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 50 win-auto-higher -x higher
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -w 0 -n 50 win-0-highest -x highest
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 2 skew-100p-normal -s 100%
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 2 skew-50p-normal -s 50%
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 2 skew-1m-normal -s 1m
 
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 50 skew-100p-normal -s 100%
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 50 skew-50p-normal -s 50%
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -n 50 skew-1m-normal -s 1m
-
-python3 gen_searches.py -c "*/2 * * * *" -p 3 -w 0 -n 50 -s 100% win-0-skew-100p-highest -x highest
+python3 gen_searches.py -c "*/2 * * * *" -p 3 -w 0 -n 2 -s 100% 

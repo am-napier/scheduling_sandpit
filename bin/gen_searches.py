@@ -5,21 +5,19 @@ import argparse
 
 parser = argparse.ArgumentParser(prog = 'gen_search',
                     description = 'make some savedsearch.conf files for testing scheduling',
-                    epilog = '''Writes to ./savedsearches.conf, copy that over your local version. 
-                    See savedsearches.conf.spec for details of params used.
-                    If you don't know these then this might not be the right tool for you to be using.
-                    ''')
-
+                    epilog ='''Writes to ./savedsearches.conf, copy that over your local version.  
+                    See README for instructions and examples.  
+                    See savedsearches.conf.spec for details of params used.''')
 parser.add_argument('name')
-parser.add_argument('-c', '--cron', default="*/5", help="A valid cron schedule")
-parser.add_argument('-s', '--skew', default=None, help="value for allow_skew, eg 80%, 3m, 1h, 1d")
-parser.add_argument('-p', '--pause', default=10, help="sets the sleep pause to simulate slow search")
+parser.add_argument('-c', '--cron', default="* * * * *", help="A valid cron schedule, def is every minute")
+parser.add_argument('-s', '--skew', default=None, help="value for allow_skew, eg one of: 80%% 3m 1h 1d, default None set")
+parser.add_argument('-p', '--pause', default=10, help="sets the sleep pause in secs to simulate slow search, default 10 secs")
 parser.add_argument('-x', '--priority', default='default', help="highest, higher, default")
-parser.add_argument('-n', '--count', default=100, help="number of searches to schedule")
-parser.add_argument('-w', '--window', default="auto", help="schedule_window value")
-parser.add_argument('-o', '--overwrite', action='store_true', default=False, help="overwrites savedsearches.conf creating a new file")
-
+parser.add_argument('-n', '--count', default=100, help="number of searches to schedule, default=100")
+parser.add_argument('-w', '--window', default="auto", help="schedule_window value, default is auto")
+parser.add_argument('-o', '--overwrite', action='store_true', default=False, help="overwrites savedsearches.conf creating a new file, default is append")
 args = parser.parse_args()
+
 pause = int(float(args.pause)*1000)
 skew = "" if args.skew is None else f'\nallow_skew = {args.skew}'
 
