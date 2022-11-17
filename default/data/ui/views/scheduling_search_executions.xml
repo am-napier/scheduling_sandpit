@@ -1,0 +1,153 @@
+<form>
+  <label>Scheduled Search Executions</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field2">
+      <label>Time</label>
+      <default>
+        <earliest>-3m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="srch_pattern" searchWhenChanged="true">
+      <label>Search Pattern</label>
+      <default>ScheduleTesting*skew-50</default>
+      <initialValue>ScheduleTesting*skew-50</initialValue>
+    </input>
+    <input type="dropdown" token="search" searchWhenChanged="true">
+      <label>Search</label>
+      <fieldForLabel>savedsearch_name</fieldForLabel>
+      <fieldForValue>savedsearch_name</fieldForValue>
+      <search>
+        <query>index=_internal sourcetype=scheduler savedsearch_name=$srch_pattern|s$ | stats c by savedsearch_name</query>
+        <earliest>$field2.earliest$</earliest>
+        <latest>$field2.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Timeline for Search: $search$</title>
+      <chart>
+        <search>
+          <query>index=_internal sourcetype="scheduler" savedsearch_name=$search|s$
+| eval actual=if(status=="success", 1, -1), scheduled=0, dispatched=0
+| appendpipe [| eval pass=1, scheduled=if(status=="success", 1, -1), dispatched=0, actual=0, _time=scheduled_time]
+| appendpipe [| where isnull(pass)| eval scheduled=0, dispatched=if(status=="success", 1, -1), actual=0, _time=dispatch_time]
+```| table _time, actual, scheduled, dispatched
+| sort _time```
+| timechart span=10s sum(actual) as complete, sum(scheduled) as scheduled, sum(dispatched) as dispatched</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field3">
+        <label></label>
+        <default>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=_internal sourcetype="scheduler" savedsearch_name IN ($srch_pattern|s$)
+| stats sum(eval(if(status=="skipped", 1, null()))) as skipped, sum(eval(if(status=="skipped", null(), 1))) as passed by savedsearch_name</query>
+          <earliest>$field3.earliest$</earliest>
+          <latest>$field3.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">large</option>
+        <option name="trellis.splitBy">_aggregation</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>List View</title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype="scheduler" savedsearch_name=$search|s$
+| eval seconds_to_dispatch=dispatch_time-scheduled_time, dispatch_time=strftime(dispatch_time, "%F %T"), scheduled_time=strftime(scheduled_time, "%F %T"), finish_time=strftime(_time, "%F %T")
+| sort _time
+| table priority window_time status scheduled_time, seconds_to_dispatch dispatch_time, run_time finish_time</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>
